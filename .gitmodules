@@ -1,3 +1,0 @@
-[submodule "client/whatever/Assets/third/xLua"]
-	path = client/whatever/Assets/third/xLua
-	url = https://github.com/Tencent/xLua.git
