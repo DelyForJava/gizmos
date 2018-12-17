@@ -1,0 +1,6 @@
+[submodule "mqant"]
+	path = mqant
+	url = https://github.com/liangdas/mqant.git
+[submodule "server/mqantserver"]
+	path = server/mqantserver
+	url = https://github.com/liangdas/mqantserver.git
