@@ -1,0 +1,68 @@
+local table = table
+local string = string
+local math = math
+
+local Event = require "Event"
+
+
+------------------------------------------------------------------------------
+local Simulation = {}
+local self = Simulation
+self.records = {} -- todo may too large
+self.queue = {}
+self.record = {}
+self.step = 1
+
+
+function Simulation.Spawn(count)
+	table.insert(self.records,self.record)
+
+	Event.Brocast("Message_Battle_Record",self.record)
+	Event.Brocast("Message_Network_Record",self.record,count)
+	-- print("server brocast count:"..count)
+end
+
+
+function Simulation.Step(count)
+
+	local integer,remainder = math.modf(count/10)
+	self.step = remainder+1
+	if self.step==1 then
+
+	elseif self.step==10 then
+	
+	end
+
+	if remainder<=0 then
+		self.Spawn(count)
+		self.queue = {}
+	end
+	
+	local rd = table.copy(self.record)
+	table.insert(self.queue,rd)
+	self.record = {}
+
+end
+
+
+function Simulation.Update()
+end
+
+
+Event.AddListener("Message_Simulation_Operation",function(id,operation)
+	local tb = {id=id,operation=operation}
+	local tag
+	for i,v in ipairs(self.record) do
+		if v.id==id then
+			tag = i
+		end
+
+	end
+	if tag then
+		table.remove(self.record,tag)
+	end
+	table.insert(self.record,tb)
+end)
+
+
+return Simulation

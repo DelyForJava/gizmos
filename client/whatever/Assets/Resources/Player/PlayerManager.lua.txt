@@ -1,0 +1,71 @@
+local Time = CS.UnityEngine.Time
+local GameObject = CS.UnityEngine.GameObject
+local Vector3 = CS.UnityEngine.Vector3
+
+------------------------------------------------------------------------
+local time = require("Common").time
+local speed = require("Common").speed
+
+local Event = require("Event")
+local model = require("Player.PlayerModel")
+local view = require("Player.PlayerView")
+
+local Manager = {}
+local self = Manager
+self.elapsed = 0
+
+
+function Manager.Reset(go)
+	model.WrapHeros(go)
+	view.CreateHeros(model.heros)
+	view.CreateShadows(model.shadows)
+end
+
+
+function Manager.LocalStep(direction)
+	if self.lock==true then
+		return
+	end
+	self.lock = true
+	local hero = model.heros[1]
+	local shadow = model.shadows[1]
+	shadow.face = direction
+	local delta = (time-self.elapsed)/1000 * speed
+	local target = shadow.position + direction * delta
+	shadow.position = target
+
+end
+
+function Manager.Step(record)
+	self.lock = false
+
+	for i,v in ipairs(model.heros) do
+		v.position = model.shadows[i].position
+	end
+	view.SetHeros(model.heros)
+	for i,v in ipairs(record) do
+		local shadow = model.shadows[v.id]
+		shadow.face = v.pos-shadow.position
+		shadow.position = v.pos
+	end
+	view.SetShadows(model.shadows)
+	self.elapsed = 0
+end
+
+
+function Manager.Update(elapsed)
+	self.elapsed = elapsed
+	view.Follow(model.heros,model.shadows,self.elapsed/time)
+
+
+end
+
+
+function self.Init()
+	Event:AddListener("Message_Player_LocalStep",self.LocalStep)
+	Event:AddListener("Message_Player_Step",self.Step)
+	self.lock = false
+end
+self.Init()
+
+return self

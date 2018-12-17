@@ -1,0 +1,62 @@
+local Event = require("Event")
+
+local Time = CS.UnityEngine.Time
+local GameObject = CS.UnityEngine.GameObject
+local RectTransformUtility = CS.UnityEngine.RectTransformUtility
+local Camera = CS.UnityEngine.Camera
+local Vector2 = CS.UnityEngine.Vector2
+local Vector3 = CS.UnityEngine.Vector3
+---------------------------------------------------------------------------------------------
+
+local Manager = {}
+local self = Manager
+self.radius = 80
+self.direction = Vector3.zero
+
+
+function self.OnDrag(isIn,pointer)
+	-- print("OnDrag ",isIn,pointer)
+	local dir = pointer.normalized
+	local pos = dir * self.radius
+	self.knob.localPosition = Vector3(pos.x,pos.y,0)
+	-- self.direction = dir
+	Event:Brocast("Message_Simulation_Direction",Vector3(dir.x,0,dir.y))
+	
+end
+
+
+function self.OnPointerDown(isIn,pointer)
+	-- print("OnPointerDown ",isIn,pointer)
+	local dir = pointer.normalized
+	local pos = dir * self.radius
+	self.knob.localPosition = Vector3(pos.x,pos.y,0)
+	Event:Brocast("Message_Simulation_Direction",Vector3(dir.x,0,dir.y))
+
+	-- self.direction = dir
+end
+
+
+function self.OnPointerUp(isIn,pointer)
+	-- print("OnPointerUp ",isIn,pointer)
+	self.knob.localPosition = self.originPosition
+	-- self.direction = Vector3.zero
+	Event:Brocast("Message_Simulation_Direction",Vector3.zero)
+
+end
+
+
+function self.Init()
+	local joystick = GameObject.Find("Canvas").transform:Find("Fullscreen/Joystick")
+	print("JoystickManager Init:",joystick)
+	local bg = joystick:GetChild(0)
+	self.knob = joystick:GetChild(1)
+	self.originPosition = self.knob.localPosition
+	local joystickBehaviour= bg:GetComponent(typeof(CS.JoystickBehaviour))
+	joystickBehaviour.luaOnDrag = self.OnDrag
+	joystickBehaviour.luaOnPointerDown = self.OnPointerDown
+	joystickBehaviour.luaOnPointerUp = self.OnPointerUp
+end
+
+self.Init()
+
+return self

@@ -1,0 +1,27 @@
+local Vector3 = CS.UnityEngine.Vector3
+
+
+local config = {
+	-- [1] = {speed=3}
+}
+
+local Model = {}
+local self = Model
+self.fixedStepTime = 5000
+
+self.heros = {}
+self.shadows = {}
+
+
+function self.WrapHeros(go)
+	for i=1,5 do
+		local pos = Vector3.zero+Vector3(i*1,1,0)
+		table.insert(self.heros,{face=Vector3.forward,position=pos,templateGo=go,speed=3})
+		table.insert(self.shadows,{face=Vector3.forward,position=pos,templateGo=go})
+	end
+
+end
+-- Deduce
+
+
+return self

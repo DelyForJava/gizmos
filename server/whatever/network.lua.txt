@@ -1,0 +1,45 @@
+local Event = require "Event"
+
+------------------------------------------------------------------------------
+local Network = {}
+local self = Network
+
+
+function Network.Reset()
+	self.elapsed = 0
+	self.record = {}
+end
+self.Reset()
+
+
+function Network.Update(elapsed,bReset)
+	-- self.elapsed = elapsed
+end
+
+
+Event.AddListener("Message_Network_Record",function(record,count)
+	Event.Brocast("S2C_Network_Record",record,count)
+	self.Reset()
+end)
+
+
+Event.AddListener("C2S_Network_Operation",function(id,operation)
+	-- model.records[#model.records],model.count
+	-- todo verify
+
+	for i,v in ipairs(self.record) do
+		if v.id==id then
+			print("Server C2S_Network_Operations forbidden")
+			-- "Message_Error_Record"
+			return
+		end
+
+	end
+
+	local tb = {id=id,operation=operation}
+	table.insert(self.record,tb)
+	Event.Brocast("Message_Simulation_Operation",id,operation)
+end)
+
+
+return Network

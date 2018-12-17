@@ -1,0 +1,21 @@
+local Model = {}
+local self = Model
+self.cfg = config
+
+self.records = {} -- todo may too large
+self.record = {}
+
+
+function self.Reset()
+	self.record = {}
+end
+self.Reset()
+
+
+function self.Step()
+	table.insert(self.records,self.record)
+	self.Reset()
+end
+
+
+return self

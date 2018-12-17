@@ -1,0 +1,34 @@
+local Event = require("Event")
+
+local time = require("Common").time
+local speed = require("Common").speed
+
+local players = {
+	{pos={x=0,y=0,z=0}},
+	{pos={x=0,y=0,z=0}},
+	{pos={x=0,y=0,z=0}},
+	{pos={x=0,y=0,z=0}},
+	{pos={x=0,y=0,z=0}},
+}
+
+------------------------------------------------------------------------------
+local Battle = {}
+local self = Battle
+local model = require("Server.BattleModel")
+
+
+Event.AddListener("Message_Battle_Record",function(record)
+
+	for i,v in ipairs(record) do
+		local id = v.id
+		local player = players[id]
+		local dir = v.operation.direction
+		-- local target = pos + dir * time/1000*speed
+		player.pos = player.pos + dir *(time-v.elapsed)/1000*speed
+		print("server record["..i.."] player["..id.."]","pos",player.pos)
+	end
+
+end)
+
+
+return Battle

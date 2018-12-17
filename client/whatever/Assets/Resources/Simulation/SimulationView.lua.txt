@@ -1,0 +1,4 @@
+local View = {}
+local self = View
+
+return self
