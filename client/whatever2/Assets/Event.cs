@@ -4,10 +4,10 @@
     //public class EventManager : Singleton<EventManager>
     class EventDefine
     {
-        public readonly static string RegetGameList = "RegetGameList";
+        public readonly static string GetGameListData = "GetGameListData";
     }
 
-    public class EventManager
+    public class Event
     {
         private static System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<System.Action>> actionListMap = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<System.Action>>();
         public static void AddActionListener(string name, System.Action action)
@@ -89,7 +89,6 @@
             }
 
         }
-
 
         private static System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<Callback>> map = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<Callback>>();
 
