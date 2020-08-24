@@ -25,6 +25,14 @@
             UnityEngine.Debug.Log(message);
         }
 
+        public static void PopLog(object message)
+        {
+            if (!isOpenLog)
+                return;
+            //todo something
+            UnityEngine.Debug.Log(message);
+        }
+
     }
 
 }

@@ -13,8 +13,6 @@
 
         void Start()
         {
-            var str = Cache.instance.GetString("version");
-            Debug.Log(Define.prefixLogCacheContent + str+ UnityEngine.Application.version); 
         }
 
     }

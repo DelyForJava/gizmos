@@ -3,7 +3,6 @@
     public class Define
     {
         //public readonly static string ConfigPath = UnityEngine.Application.persistentDataPath + "/config/";
-
         public readonly static string prefixLogWebRequest = ">======= web request: ";
         public readonly static string prefixLogLocalFileSaved = ">------- local file saved: ";
         public readonly static string prefixLogCacheContent = ">------- cache content: ";
