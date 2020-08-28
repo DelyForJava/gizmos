@@ -4,3 +4,6 @@
 [submodule "server/mqantserver"]
 	path = server/mqantserver
 	url = https://github.com/liangdas/mqantserver.git
+[submodule "client/whatever2/Assets/Third/xLua"]
+	path = client/whatever2/Assets/Third/xLua
+	url = https://github.com/Tencent/xLua.git
