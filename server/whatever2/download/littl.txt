@@ -1,0 +1,4 @@
+http://39.104.87.202:8080/upload/up/iOS/1.1/ServerInfo.xml
+
+root
+Za1CAVftspOIBJ8a

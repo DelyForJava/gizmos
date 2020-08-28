@@ -1,9 +1,9 @@
 
-/client/whatever/Library/
-/client/whatever/Packages/
-/client/whatever/publish/
-/client/whatever/Temp/
-/client/whatever/Assembly-CSharp.csproj
-/client/whatever/Assembly-CSharp-Editor.csproj
-/client/whatever/whatever.sln
-/client/whatever2/Temp/
+/client/*/Library/
+/client/*/Packages/
+/client/*/publish/
+/client/*/Temp/
+/client/*/Assembly-CSharp.csproj
+/client/*/Assembly-CSharp-Editor.csproj
+/client/*/whatever.sln
+/client/*/Temp/
