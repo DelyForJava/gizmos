@@ -1,6 +1,5 @@
 
 /client/*/Library/
-/client/*/Packages/
 /client/*/publish/
 /client/*/Temp/
 /client/*/Assembly-CSharp.csproj
