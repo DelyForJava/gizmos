@@ -1,0 +1,23 @@
+local os = require 'os'
+local string = require 'string'
+local math = require 'math'
+local debug = require 'debug'
+
+local table = require 'table'
+
+local json = require 'json'
+
+local module = {}
+table.insert(module,"chess")
+table.insert(module,"poker")
+table.insert(module,"majio")
+for k,v in pairs(module) do
+	print(k..v)
+end
+local files = CS.System.IO.Directory.GetFiles(CS.Whatever.Define.moduleLocalDirectory)
+for i=0,files.Length-1 do
+	print(files[i])
+end
+
+require("util")
+require("chess")

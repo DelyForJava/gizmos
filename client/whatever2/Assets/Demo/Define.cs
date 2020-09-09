@@ -15,6 +15,10 @@
         public readonly static string assetBundlePath;
 
 
+        public readonly static string versionName = "version";
+        public readonly static string versionURL = prefixRemotePath + "version";
+
+
         public readonly static string patchDirectory = "patch/";
         public readonly static string patchName = "hotfix.lua.txt";
 
@@ -23,6 +27,8 @@
         public readonly static string patchLocalDirectory = prefixLocalPath + patchDirectory;
         public readonly static string patchFullname = prefixLocalPath + patchDirectory + patchName;
 
+        public readonly static string moduleDirectory = "module/";
+        public readonly static string moduleLocalDirectory = prefixLocalPath + moduleDirectory;
 
         public readonly static UnityEngine.Color myGreen = new UnityEngine.Color(70,200,70,135);
         public readonly static UnityEngine.Color myBlue = new UnityEngine.Color(0, 120, 255, 135);

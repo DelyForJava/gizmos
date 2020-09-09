@@ -6,7 +6,7 @@
         static byte[] PatchLuaLoader(ref string fileName)
         {
             string fullPath = Define.patchLocalDirectory + @"/" + fileName + ".lua.txt";
-            Debug.Log("lua script path:" + fullPath);
+            Debug.Log("patch lua script path:" + fullPath);
             if (!System.IO.File.Exists(fullPath))
                 return null;
             string txtString = System.IO.File.ReadAllText(fullPath);
@@ -17,6 +17,11 @@
         {
             patchLuaEnv = new XLua.LuaEnv();
             patchLuaEnv.AddLoader(PatchLuaLoader);
+        }
+
+        public static System.Collections.IEnumerator StartCheck()
+        {
+            yield return GetRemotePatchID();
         }
 
         static int localPatchID;

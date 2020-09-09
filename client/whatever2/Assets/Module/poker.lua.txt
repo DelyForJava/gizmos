@@ -1,0 +1,24 @@
+local string = require 'string'
+local os = require 'os'
+local table = require 'table'
+local math = require 'math'
+local debug = require 'debug'
+
+print("math pi"..math.pi)
+
+local json = require 'json'
+
+print('module in lua')
+
+local tb = {one='first',two='second'}
+
+local DoTest = function()
+	local jsonStr = json.encode(tb)
+    print("DoTest:"..jsonStr)
+    local jsonTb = json.decode(jsonStr)
+	for k,v in pairs(jsonTb) do
+		print("k:"..k..",v:"..v)
+	end
+end
+
+DoTest()

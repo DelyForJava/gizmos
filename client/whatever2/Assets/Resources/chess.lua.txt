@@ -1,0 +1,127 @@
+local table = require "table"
+
+local model = require("model")
+
+local UnityEngine = CS.UnityEngine
+local GameObject = UnityEngine.GameObject
+local Resource = UnityEngine.Resources
+
+local Vector2 = UnityEngine.Vector2
+local Vector3 = UnityEngine.Vector3
+
+local gridLength = 64
+local leftTopPosition = Vector2(-4*gridLength,(4+1/2)*gridLength)
+
+for k,v in pairs(model.points) do
+	for ii,vv in ipairs(v) do
+		local pos = leftTopPosition + Vector2((ii-1),-k)*gridLength
+		vv.pos = pos
+		-- print(vv.pos.x..","..vv.pos.y.."\n")
+	end
+end
+OnClickPiece = function(piece)
+	print("OnClickPiece "..",row:"..piece.coord.row..",column:"..piece.coord.column..",name:"..piece.name..",id:"..piece.id)
+end
+
+CoordToPosition = function(row,column)
+	local point = model.points[row][column]
+	return Vector3(point.pos.x,point.pos.y,0)
+end
+
+local prefab = Resource.Load("Piece")
+local canvasGo = GameObject.Find("Canvas")
+
+CreatePieces = function()
+	for i,v in ipairs(model.hanPieces)do
+		local pos = CoordToPosition(v.row,v.column)
+		local clone = GameObject.Instantiate(prefab)
+		clone.name = v.id
+		local text = clone:GetComponentInChildren( typeof(CS.UnityEngine.UI.Text) )
+		text.text = v.name
+		clone.transform:SetParent(canvasGo.transform)
+		clone.transform.localScale = Vector3.one
+		clone.transform.localPosition = Vector3(pos.x,pos.y,0)
+		v.gameObject = clone;
+	end
+
+	for i,v in ipairs(model.chuPieces)do
+		local pos = CoordToPosition(v.row,v.column)
+		local clone = GameObject.Instantiate(prefab)
+		clone.name = v.id
+		local button = clone:GetComponentInChildren(typeof(CS.UnityEngine.UI.Button))
+		button.onClick:AddListener(function()
+			OnClickPiece(v)
+		end)
+		local text = clone:GetComponentInChildren(typeof(CS.UnityEngine.UI.Text))
+		text.text = v.name
+		clone.transform:SetParent(canvasGo.transform)
+		clone.transform.localScale = Vector3.one
+		clone.transform.localPosition = Vector3(pos.x,pos.y,0)
+		v.gameObject = clone;
+	end
+
+end
+CreatePieces()
+
+-- todo timer
+GotoNormal = function()
+	for i,v in ipairs(model.hanPieces) do
+		local row = v.normalRow
+		local column = v.normalColumn
+		local targetPosition = CoordToPosition(row,column)
+        CS.DG.Tweening.ShortcutExtensions.DOLocalMove(v.gameObject.transform,targetPosition,0.5)
+		v.row = row
+		v.column = column
+	end
+
+	for i,v in ipairs(model.chuPieces) do
+		local row = v.normalRow
+		local column = v.normalColumn
+		local targetPosition = CoordToPosition(row,column)
+		CS.DG.Tweening.ShortcutExtensions.DOLocalMove(v.gameObject.transform,targetPosition,0.5)
+		v.row = row
+		v.column = column
+	end
+end
+-- GotoNormal()
+
+-- todo timer
+GotoInit = function()
+	for i,v in ipairs(model.hanPieces) do
+		local row = v.initRow
+		local column = v.initColumn
+		local targetPosition = CoordToPosition(row,column)
+        CS.DG.Tweening.ShortcutExtensions.DOLocalMove(v.gameObject.transform,targetPosition,0.5)
+		v.row = row
+		v.column = column
+	end
+
+	for i,v in ipairs(model.chuPieces) do
+		local row = v.initRow
+		local column = v.initColumn
+		local targetPosition = CoordToPosition(row,column)
+		CS.DG.Tweening.ShortcutExtensions.DOLocalMove(v.gameObject.transform,targetPosition,0.5)
+		v.row = row
+		v.column = column
+	end
+end
+-- GotoInit()
+
+local OnClickReset = function()
+	GotoInit()
+end
+
+local OnClickMatch = function()
+	GotoNormal()
+end
+
+local OnClickInvite = function()
+end
+
+local resetButton = canvasGo.transform:Find("Reset"):GetComponent(typeof(UnityEngine.UI.Button))
+local matchButton = canvasGo.transform:Find("Match"):GetComponent(typeof(UnityEngine.UI.Button))
+local inviteButton = canvasGo.transform:Find("Invite"):GetComponent(typeof(UnityEngine.UI.Button))
+
+resetButton.onClick:AddListener(OnClickReset)
+matchButton.onClick:AddListener(OnClickMatch)
+inviteButton.onClick:AddListener(OnClickInvite)
