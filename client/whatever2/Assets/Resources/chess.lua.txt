@@ -1,127 +1,227 @@
 local table = require "table"
 
-local model = require("model")
+local model = require("ChessModel")
 
-local UnityEngine = CS.UnityEngine
-local GameObject = UnityEngine.GameObject
-local Resource = UnityEngine.Resources
+local Chess = {}
 
-local Vector2 = UnityEngine.Vector2
-local Vector3 = UnityEngine.Vector3
-
-local gridLength = 64
-local leftTopPosition = Vector2(-4*gridLength,(4+1/2)*gridLength)
+local pieceMoveSpeed = 0.2
+local pieceMoveTime = 0.2
+local pointGap = 0.05
+local leftTopPosition = CS.UnityEngine.Vector3(-4*pointGap,0,(4+1/2)*pointGap)
+local chessGameObject = CS.UnityEngine.GameObject.Find("Chess")
 
 for k,v in pairs(model.points) do
 	for ii,vv in ipairs(v) do
-		local pos = leftTopPosition + Vector2((ii-1),-k)*gridLength
-		vv.pos = pos
-		-- print(vv.pos.x..","..vv.pos.y.."\n")
+		local position = leftTopPosition + CS.UnityEngine.Vector3((ii-1),0,-k)*pointGap
+		vv.position = position
+		local pointGameObject = CS.UnityEngine.GameObject()
+		pointGameObject.name = vv.row.."_"..vv.column
+		pointGameObject.transform:SetParent(chessGameObject.transform)
+		pointGameObject.transform.localPosition = position
+		local boxCollider = pointGameObject:AddComponent(typeof(CS.UnityEngine.BoxCollider))
+		boxCollider.center = CS.UnityEngine.Vector3.zero
+		boxCollider.size = CS.UnityEngine.Vector3(0.05,0.05,0.05)
 	end
 end
-OnClickPiece = function(piece)
-	print("OnClickPiece "..",row:"..piece.coord.row..",column:"..piece.coord.column..",name:"..piece.name..",id:"..piece.id)
+
+local selectPoint
+
+Chess.FindPieceById = function(id)
+	-- print("id:"..id)
+	local ret
+	for k,v in pairs(model.hanPieces) do
+		if v.id==id then
+			ret = v
+			return ret
+		end
+	end
+	if not ret then
+		for k,v in pairs(model.chuPieces) do
+			if v.id==id then
+				ret = v
+				return ret
+			end
+		end
+	end
+	return ret
+end
+
+Chess.FindPointById = function(id)
+	local ret
+	for k,v in pairs(model.points) do
+		for kk,vv in pairs(v) do
+			if vv.id==id then
+				ret = vv
+				return ret
+			end
+		end
+	end
+	return ret
+end
+
+Chess.SelectPoint = function(hitPoint)
+	if selectPoint then
+		-- down selectPoint
+	end
+	-- up currentPiece
+end
+
+Chess.SetTargetPoint = function(point)
+	local piece = Chess.FindPieceById(selectPoint.id)
+	Goto(selectPoint.row,selectPoint.column,point.row,point.column)
+	local targetPosition = CoordToPosition(point.row,point.column)
+    CS.DG.Tweening.ShortcutExtensions.DOLocalMove(piece.gameObject.transform,targetPosition,pieceMoveTime)
+end
+
+Chess.OnClickPoint = function(row,column)
+	local point = model.points[row][column]
+	-- print("OnClickPoint ".."row:"..row..",column:"..column..",id:"..point.id..",point.name"..point.name)
+
+	if point.id==0 then
+		if selectPoint then
+			Chess.SetTargetPoint(point)
+			selectPoint = nil
+		end
+	else
+		Chess.SelectPoint(point)
+		selectPoint = point
+	end
 end
 
 CoordToPosition = function(row,column)
 	local point = model.points[row][column]
-	return Vector3(point.pos.x,point.pos.y,0)
+	return point.position
 end
 
-local prefab = Resource.Load("Piece")
-local canvasGo = GameObject.Find("Canvas")
+local prefab = CS.UnityEngine.Resources.Load("Cell")
 
 CreatePieces = function()
 	for i,v in ipairs(model.hanPieces)do
 		local pos = CoordToPosition(v.row,v.column)
-		local clone = GameObject.Instantiate(prefab)
+		local clone = CS.UnityEngine.GameObject.Instantiate(prefab)
 		clone.name = v.id
-		local text = clone:GetComponentInChildren( typeof(CS.UnityEngine.UI.Text) )
+		local text = clone:GetComponentInChildren( typeof(CS.UnityEngine.TextMesh) )
 		text.text = v.name
-		clone.transform:SetParent(canvasGo.transform)
-		clone.transform.localScale = Vector3.one
-		clone.transform.localPosition = Vector3(pos.x,pos.y,0)
+		clone.transform:SetParent(chessGameObject.transform)
+		clone.transform.localPosition = pos
 		v.gameObject = clone;
 	end
 
 	for i,v in ipairs(model.chuPieces)do
 		local pos = CoordToPosition(v.row,v.column)
-		local clone = GameObject.Instantiate(prefab)
+		local clone = CS.UnityEngine.GameObject.Instantiate(prefab)
 		clone.name = v.id
-		local button = clone:GetComponentInChildren(typeof(CS.UnityEngine.UI.Button))
-		button.onClick:AddListener(function()
-			OnClickPiece(v)
-		end)
-		local text = clone:GetComponentInChildren(typeof(CS.UnityEngine.UI.Text))
+		local text = clone:GetComponentInChildren(typeof(CS.UnityEngine.TextMesh))
 		text.text = v.name
-		clone.transform:SetParent(canvasGo.transform)
-		clone.transform.localScale = Vector3.one
-		clone.transform.localPosition = Vector3(pos.x,pos.y,0)
+		clone.transform:SetParent(chessGameObject.transform)
+		clone.transform.localPosition = pos
 		v.gameObject = clone;
 	end
-
 end
 CreatePieces()
 
+PrintPoints = function()
+	local tb = {}
+	for k,v in ipairs(model.points) do
+		table.insert(tb,v)
+	end
+	table.insert(tb,1,model.points[0])
+	table.insert(tb,1,model.points[-1])
+	table.insert(tb,1,model.points[-2])
+
+	local str = "\n"
+	for k,v in ipairs(tb) do
+		local rowStr = "	"
+		for ii,vv in ipairs(v) do
+			pointStr = vv.name
+			rowStr = rowStr.." "..pointStr
+		end
+		rowStr = rowStr.."\n"
+		str = str..rowStr
+	end
+	print(str)
+end
+
+PrintPoints()
+
+local SetPoint = function(point,id,name)
+	-- print("before id:"..point.id..",name:"..point.name)
+	point.id = id
+	point.name = name
+	-- print("after id:"..point.id..",name:"..point.name)
+end
+
+Goto = function(fromRow,fromColumn,toRow,toColumn)
+	-- print("fromRow:"..fromRow..",fromColumn:"..fromColumn..",toRow:"..toRow..",toColumn:"..toColumn)
+	local fromPoint = model.points[fromRow][fromColumn]
+	local id= fromPoint.id
+	local name = fromPoint.name
+	SetPoint(fromPoint,0,model.emptyPieceName)
+	local toPoint = model.points[toRow][toColumn]
+	SetPoint(toPoint,id,name)
+	-- print("fromPoint:"..fromPoint.id..",toPoint"..toPoint.id)
+	PrintPoints()
+end
+
+SequenceTo = function(fromRow,fromColumn,toRow,toColumn)
+	Goto(fromRow,fromColumn,toRow,toColumn)
+end
+
 -- todo timer
-GotoNormal = function()
+SpawnToNormal = function()
 	for i,v in ipairs(model.hanPieces) do
-		local row = v.normalRow
-		local column = v.normalColumn
-		local targetPosition = CoordToPosition(row,column)
-        CS.DG.Tweening.ShortcutExtensions.DOLocalMove(v.gameObject.transform,targetPosition,0.5)
-		v.row = row
-		v.column = column
+		local point = Chess.FindPointById(v.id)
+		Goto(point.row,point.column,v.normalRow,v.normalColumn)
+		local targetPosition = CoordToPosition(v.normalRow,v.normalColumn)
+        CS.DG.Tweening.ShortcutExtensions.DOLocalMove(v.gameObject.transform,targetPosition,pieceMoveTime)
 	end
 
 	for i,v in ipairs(model.chuPieces) do
-		local row = v.normalRow
-		local column = v.normalColumn
-		local targetPosition = CoordToPosition(row,column)
-		CS.DG.Tweening.ShortcutExtensions.DOLocalMove(v.gameObject.transform,targetPosition,0.5)
-		v.row = row
-		v.column = column
+		local point = Chess.FindPointById(v.id)
+		Goto(point.row,point.column,v.normalRow,v.normalColumn)
+		local targetPosition = CoordToPosition(v.normalRow,v.normalColumn)
+        CS.DG.Tweening.ShortcutExtensions.DOLocalMove(v.gameObject.transform,targetPosition,pieceMoveTime)
 	end
+	PrintPoints()
 end
--- GotoNormal()
 
 -- todo timer
-GotoInit = function()
+SpawnToInit = function()
 	for i,v in ipairs(model.hanPieces) do
-		local row = v.initRow
-		local column = v.initColumn
-		local targetPosition = CoordToPosition(row,column)
-        CS.DG.Tweening.ShortcutExtensions.DOLocalMove(v.gameObject.transform,targetPosition,0.5)
-		v.row = row
-		v.column = column
+		local point = Chess.FindPointById(v.id)
+		Goto(point.row,point.column,v.initRow,v.initColumn)
+		local targetPosition = CoordToPosition(v.initRow,v.initColumn)
+        CS.DG.Tweening.ShortcutExtensions.DOLocalMove(v.gameObject.transform,targetPosition,pieceMoveTime)
 	end
 
 	for i,v in ipairs(model.chuPieces) do
-		local row = v.initRow
-		local column = v.initColumn
-		local targetPosition = CoordToPosition(row,column)
-		CS.DG.Tweening.ShortcutExtensions.DOLocalMove(v.gameObject.transform,targetPosition,0.5)
-		v.row = row
-		v.column = column
+		local point = Chess.FindPointById(v.id)
+		Goto(point.row,point.column,v.initRow,v.initColumn)
+		local targetPosition = CoordToPosition(v.initRow,v.initColumn)
+        CS.DG.Tweening.ShortcutExtensions.DOLocalMove(v.gameObject.transform,targetPosition,pieceMoveTime)
 	end
+	PrintPoints()
 end
--- GotoInit()
 
 local OnClickReset = function()
-	GotoInit()
+	SpawnToInit()
 end
 
 local OnClickMatch = function()
-	GotoNormal()
+	SpawnToNormal()
 end
 
 local OnClickInvite = function()
 end
 
-local resetButton = canvasGo.transform:Find("Reset"):GetComponent(typeof(UnityEngine.UI.Button))
-local matchButton = canvasGo.transform:Find("Match"):GetComponent(typeof(UnityEngine.UI.Button))
-local inviteButton = canvasGo.transform:Find("Invite"):GetComponent(typeof(UnityEngine.UI.Button))
+local canvasGameObject = CS.UnityEngine.GameObject.Find("Canvas")
+
+local resetButton = canvasGameObject.transform:Find("Reset"):GetComponent(typeof(CS.UnityEngine.UI.Button))
+local matchButton = canvasGameObject.transform:Find("Match"):GetComponent(typeof(CS.UnityEngine.UI.Button))
+local inviteButton = canvasGameObject.transform:Find("Invite"):GetComponent(typeof(CS.UnityEngine.UI.Button))
 
 resetButton.onClick:AddListener(OnClickReset)
 matchButton.onClick:AddListener(OnClickMatch)
 inviteButton.onClick:AddListener(OnClickInvite)
+
+return Chess

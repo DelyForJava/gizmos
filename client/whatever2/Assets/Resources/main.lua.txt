@@ -14,10 +14,27 @@ table.insert(module,"majio")
 for k,v in pairs(module) do
 	print(k..v)
 end
+
 local files = CS.System.IO.Directory.GetFiles(CS.Whatever.Define.moduleLocalDirectory)
 for i=0,files.Length-1 do
 	print(files[i])
 end
 
 require("util")
-require("chess")
+local Chess = require("Chess")
+
+Update = function()
+	-- print("update driver from C#")
+end
+
+OnClick = function(gameObject)
+	local name = gameObject.name
+	print("OnClick name:"..name)
+	local parentName = gameObject.transform.parent.name
+	if parentName=="Chess" then
+		local strs = split(name,'_')
+		local row = tonumber(strs[1])
+		local column = tonumber(strs[2])
+		Chess.OnClickPoint(row,column)
+	end
+end

@@ -3,6 +3,7 @@
     public class Module
     {
         static XLua.LuaEnv luaEnv;
+        static System.Action<UnityEngine.GameObject> luaOnClick;
         static byte[] LuaLoader(ref string fileName)
         {
             string fullPath = Define.moduleLocalDirectory + @"/" + fileName + ".lua.txt";
@@ -16,6 +17,8 @@
         {
             luaEnv = new XLua.LuaEnv();
             //luaEnv.AddLoader(LuaLoader);
+
+
         }
 
         public static void Start()
@@ -25,6 +28,18 @@
                 System.IO.Directory.CreateDirectory(Define.moduleLocalDirectory);
             }
             luaEnv.DoString("require('main')");
+
+            luaEnv.Global.Get("OnClick", out luaOnClick);
+        }
+
+        public static void OnClick(UnityEngine.GameObject gameObject)
+        {
+            luaOnClick(gameObject);
+        }
+
+        public static void Update()
+        {
+            //luaUpdate();
         }
 
     }

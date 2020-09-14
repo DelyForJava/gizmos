@@ -24,7 +24,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - Chess
   - 
   - 
   - 
@@ -40,4 +40,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Chess
+    uniqueID: 841843779
+    locked: 0
+  - name: UI
+    uniqueID: 2165195459
     locked: 0
